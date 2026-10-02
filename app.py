@@ -4,12 +4,14 @@ from flask import Flask, jsonify
 
 from summarizer import summarize_file
 
+DEFAULT_SAMPLE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "sample.jsonl")
+
 app = Flask(__name__)
 
 
 @app.get("/summary")
 def get_summary():
-    sample_file = os.environ.get("SAMPLE_FILE", "data/sample.jsonl")
+    sample_file = os.environ.get("SAMPLE_FILE", DEFAULT_SAMPLE)
     try:
         summary = summarize_file(sample_file)
     except OSError:

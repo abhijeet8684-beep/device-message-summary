@@ -1,0 +1,28 @@
+﻿============================= test session starts =============================
+collecting ... collected 23 items
+
+tests/test_summary.py::test_sample_input_expected_result PASSED          [  4%]
+tests/test_summary.py::test_out_of_order_sequence_counts_by_highest_sequence PASSED [  8%]
+tests/test_summary.py::test_empty_input_is_valid_success PASSED          [ 13%]
+tests/test_summary.py::test_bool_sequence_is_invalid_record PASSED       [ 17%]
+tests/test_summary.py::test_negative_sequence_is_invalid_record PASSED   [ 21%]
+tests/test_summary.py::test_float_sequence_is_invalid_record PASSED      [ 26%]
+tests/test_summary.py::test_string_sequence_is_invalid_record PASSED     [ 30%]
+tests/test_summary.py::test_empty_device_id_is_invalid_record PASSED     [ 34%]
+tests/test_summary.py::test_whitespace_device_id_is_invalid_record PASSED [ 39%]
+tests/test_summary.py::test_non_string_device_id_is_invalid_record PASSED [ 43%]
+tests/test_summary.py::test_extra_key_is_invalid_record PASSED           [ 47%]
+tests/test_summary.py::test_missing_key_is_invalid_record PASSED         [ 52%]
+tests/test_summary.py::test_scalar_json_is_invalid_record_not_bad_json PASSED [ 56%]
+tests/test_summary.py::test_blank_line_is_bad_json_and_processing_continues PASSED [ 60%]
+tests/test_summary.py::test_deeply_nested_json_is_bad_json_and_processing_continues PASSED [ 65%]
+tests/test_summary.py::test_nan_is_bad_json PASSED                       [ 69%]
+tests/test_summary.py::test_duplicate_with_different_status_still_duplicate PASSED [ 73%]
+tests/test_summary.py::test_invalid_record_does_not_consume_duplicate_key PASSED [ 78%]
+tests/test_summary.py::test_ids_are_preserved_exactly PASSED             [ 82%]
+tests/test_summary.py::test_devices_are_sorted_by_device_id PASSED       [ 86%]
+tests/test_summary.py::test_http_summary_returns_success_for_sample PASSED [ 91%]
+tests/test_summary.py::test_default_sample_path_is_project_relative PASSED [ 95%]
+tests/test_summary.py::test_missing_file_returns_500_with_unreadable_code PASSED [100%]
+
+============================= 23 passed in 0.16s ==============================

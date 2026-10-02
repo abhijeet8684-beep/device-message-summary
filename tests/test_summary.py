@@ -126,6 +126,20 @@ def test_blank_line_is_bad_json_and_processing_continues():
     ]
 
 
+def test_deeply_nested_json_is_bad_json_and_processing_continues():
+    nested_line = b"[" * 100000 + b"]" * 100000
+    valid_record = b'{"device_id": "D01", "sequence": 1, "status": "ok"}'
+    raw = nested_line + b"\n" + valid_record
+
+    result = summarize_bytes(raw)
+
+    assert result["errors"] == [{"line": 1, "code": "BAD_JSON"}]
+    assert result["accepted"] == 1
+    assert result["devices"] == [
+        {"device_id": "D01", "ok": 1, "error": 0, "last_sequence": 1, "last_status": "ok"}
+    ]
+
+
 def test_nan_is_bad_json():
     result = summarize_bytes(b'NaN\n')
 
@@ -196,6 +210,25 @@ def test_http_summary_returns_success_for_sample():
     assert data["accepted"] == 3
     assert data["duplicates"] == 1
     assert data["errors"] == [{"line": 4, "code": "BAD_JSON"}]
+
+
+def test_default_sample_path_is_project_relative(monkeypatch, tmp_path):
+    monkeypatch.delenv("SAMPLE_FILE", raising=False)
+    monkeypatch.chdir(tmp_path)
+
+    client = app.test_client()
+    response = client.get("/summary")
+
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "accepted": 3,
+        "duplicates": 1,
+        "errors": [{"line": 4, "code": "BAD_JSON"}],
+        "devices": [
+            {"device_id": "D01", "ok": 1, "error": 1, "last_sequence": 3, "last_status": "error"},
+            {"device_id": "D02", "ok": 0, "error": 1, "last_sequence": 2, "last_status": "error"},
+        ],
+    }
 
 
 def test_missing_file_returns_500_with_unreadable_code():

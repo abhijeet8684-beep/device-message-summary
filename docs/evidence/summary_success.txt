@@ -1,0 +1,8 @@
+﻿HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.12.10
+Date: Fri, 02 Oct 2026 10:23:21 GMT
+Content-Type: application/json
+Content-Length: 236
+Connection: close
+
+{"accepted":3,"devices":[{"device_id":"D01","error":1,"last_sequence":3,"last_status":"error","ok":1},{"device_id":"D02","error":1,"last_sequence":2,"last_status":"error","ok":0}],"duplicates":1,"errors":[{"code":"BAD_JSON","line":4}]}

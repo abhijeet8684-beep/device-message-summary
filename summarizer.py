@@ -55,7 +55,7 @@ def summarize_bytes(raw_bytes):
 
         try:
             parsed = json.loads(text, parse_constant=_reject_constant)
-        except (TypeError, ValueError, json.JSONDecodeError):
+        except (ValueError, RecursionError):
             errors.append({"line": line_number, "code": "BAD_JSON"})
             continue
 

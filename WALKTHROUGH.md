@@ -1,73 +1,76 @@
-# Walkthrough
+# Five-minute presentation script
 
-## 1) Project structure
+## 1. Overview and main flow — 30 seconds
 
-The project contains the required files:
+Introduce the project as a Flask endpoint backed by a JSONL summarizer. Point out `app.py`, `summarizer.py`,
+`data/sample.jsonl`, and `tests/test_summary.py`. The summarizer parses and validates each line, then filters
+duplicate keys before aggregating device totals.
 
-```bash
-app.py
-summarizer.py
-data/sample.jsonl
-requirements.txt
-README.md
-WALKTHROUGH.md
-.gitignore
-tests/test_summary.py
-```
+## 2. Successful request — 1 minute
 
-## 2) Main processing flow
+From the repository root, **Terminal 1**:
 
-The logic lives in `summarizer.py` and reads the JSONL file as bytes. It splits on `\n`, removes a trailing `\r`, decodes each line individually as UTF-8, validates each record, and ignores duplicates after the first valid `(device_id, sequence)` pair. The result is a summary dictionary with `accepted`, `duplicates`, `errors`, and `devices`.
-
-## 3) Running tests
-
-```bash
-python -m pytest -q
-```
-
-The project is configured with a local pytest temp directory (`.pytest_tmp`) to avoid the Windows permission problem that can occur when pytest tries to use the global temp folder. If you want to force the same setting manually:
-
-```bash
-python -m pytest -q --basetemp=./.pytest_tmp
-```
-
-This executes the focused pytest suite covering the sample case, edge cases, and HTTP behavior.
-
-## 4) Running the Flask server
-
-```bash
+```powershell
 python app.py
 ```
 
-The app listens on:
+In **Terminal 2**:
 
-```bash
-http://127.0.0.1:5000
+```powershell
+curl.exe -sS -i http://127.0.0.1:5000/summary
 ```
 
-## 5) Calling /summary
+Show the HTTP 200 result in [`docs/evidence/summary_success.txt`](docs/evidence/summary_success.txt) and the
+[HTTP 200 screenshot](docs/screenshots/01_summary_200.png). The sample summary accepts three records, counts one
+duplicate, and reports malformed line 4 as `BAD_JSON`.
 
-```bash
-curl http://127.0.0.1:5000/summary
+## 3. Unreadable-file failure — 1 minute
+
+Stop Terminal 1 with `Ctrl+C`, then restart with an intentionally missing sample path:
+
+```powershell
+$env:SAMPLE_FILE="data\does-not-exist.jsonl"
+python app.py
 ```
 
-The endpoint returns the summary JSON for the configured `SAMPLE_FILE` input or the default `data/sample.jsonl` file.
+In Terminal 2, issue the same request:
 
-## 6) Demonstrating the failure case
-
-To demonstrate a missing or unreadable file response:
-
-```bash
-SAMPLE_FILE=missing_file.jsonl python app.py
-curl http://127.0.0.1:5000/summary
+```powershell
+curl.exe -sS -i http://127.0.0.1:5000/summary
 ```
 
-Expected result: HTTP 500 with a JSON payload containing `error.code = "SAMPLE_FILE_UNREADABLE"`.
+Show HTTP 500, `SAMPLE_FILE_UNREADABLE`, and the [failure screenshot](docs/screenshots/02_summary_500.png).
+This error response is distinct from an empty successful summary. Stop the server and restore the environment:
 
-## 7) One design choice
+```powershell
+Remove-Item Env:SAMPLE_FILE
+```
 
-I kept the business logic in `summarizer.py` and kept Flask strictly in `app.py`. This makes the validation and aggregation logic easy to test without a running web server.
+macOS/Linux equivalents: `SAMPLE_FILE=data/does-not-exist.jsonl python3 app.py`, then `unset SAMPLE_FILE`.
 
-## 8) Defect found and fixed
+## 4. Tests — 1 minute
 
-[FILL IN — Defect found and fixed]
+From the repository root, run:
+
+```powershell
+python -m pytest -q
+```
+
+The verified suite has 23 passing tests. Show the [pytest screenshot](docs/screenshots/03_pytest_pass.png) and
+the full captured reports: [`pytest_verbose.txt`](docs/evidence/pytest_verbose.txt) and
+[`pytest_plain.txt`](docs/evidence/pytest_plain.txt).
+
+## 5. Design choice and defect fixed — 1 minute
+
+**Design choice:** Validation occurs before duplicate detection, ensuring invalid input does not consume a key.
+The processing logic is separate from Flask and can be tested directly.
+
+**Defect found and fixed:** Deeply nested JSON could raise an uncaught `RecursionError` and abort the summary; it is
+now handled per line as `BAD_JSON`. The default sample path also depended on the working directory; it is now
+anchored to `app.py`. Regression tests cover both fixes.
+
+## Additional captured evidence
+
+- [`summary_other_cwd.txt`](docs/evidence/summary_other_cwd.txt) records HTTP 200 when the app is launched from
+  outside the repository directory.
+- [`summary_missing_file.txt`](docs/evidence/summary_missing_file.txt) contains the captured failure response.

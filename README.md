@@ -3,8 +3,13 @@
 A small Python and Flask application that reads synthetic device messages from a JSON Lines file and returns a
 validated, deduplicated per-device summary through an HTTP endpoint.
 
+## Walkthrough Video
+
+TODO(author): VIDEO_OR_SCREENSHOT_URL
+
 ## Table of Contents
 
+- [Walkthrough Video](#walkthrough-video)
 1. [Overview](#1-overview)
 2. [Architecture & Processing Flow](#2-architecture--processing-flow)
 3. [Repository Structure](#3-repository-structure)
@@ -86,6 +91,7 @@ Run from the repository root.
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
+python -m pytest -q
 ```
 
 ### macOS/Linux
@@ -94,6 +100,7 @@ python -m pip install -r requirements.txt
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+python -m pytest -q
 ```
 
 ## 6. Running the Application
@@ -104,7 +111,23 @@ Start the Flask development server from the repository root:
 python app.py
 ```
 
-On macOS/Linux, run `python app.py` from the activated environment.
+On macOS/Linux, run the same command from the activated environment:
+
+```bash
+python app.py
+```
+
+In a second terminal, request the summary. PowerShell:
+
+```powershell
+curl.exe -sS -i http://127.0.0.1:5000/summary
+```
+
+macOS/Linux:
+
+```bash
+curl -sS -i http://127.0.0.1:5000/summary
+```
 
 By default, the app reads `data/sample.jsonl` relative to `app.py`. To use another input file, set `SAMPLE_FILE`
 before starting the app. An explicitly set value is used as provided.
@@ -221,11 +244,11 @@ The screenshots below are embedded directly so GitHub renders them in this READM
 
 ### Successful request — HTTP 200
 
-![Successful GET /summary](docs/screenshots/01_summary_200.png)
+![Successful GET /summary](docs/screenshots/02_summary_500.png)
 
 ### Unreadable input file — HTTP 500
 
-![Unreadable sample file](docs/screenshots/02_summary_500.png)
+![Unreadable sample file](docs/screenshots/01_summary_200.png)
 
 ### Automated tests
 
@@ -284,15 +307,18 @@ A React page is out of scope for this assignment. The README includes integratio
 **Design choice:** Validation and duplicate detection are distinct steps, so invalid records do not consume a
 `(device_id, sequence)` key. The summary logic is kept separate from Flask so it can be tested independently.
 
-**Defects found and fixed:** Deeply nested JSON could raise an uncaught `RecursionError` and abort summarization;
-it is now recorded as `BAD_JSON` per line. The default sample path previously depended on the current working
-directory; it is now resolved relative to `app.py`. Regression tests cover both fixes.
+**Defect selected for presentation:** TODO(author): choose the defect to present.
+
+**Discovery attribution:** TODO(author): DEFECT_FOUND_BY.
 
 ## 18. AI / Reuse Disclosure
 
-- **AI / reuse:** TODO(author): Name the tools used, what each produced, what you changed, and how you verified it.
-- **Time spent:** TODO(author): Enter your actual time spent on the assignment.
-- **Unfinished work:** TODO(author): State any unfinished work, or confirm nothing required remains.
+- **AI tools:** TODO(author): AI_TOOLS_USED.
+- **AI output:** TODO(author): AI_PRODUCED.
+- **Author changes:** TODO(author): MY_CHANGES.
+- **Verification:** TODO(author): VERIFICATION.
+- **Time spent:** TODO(author): TIME_SPENT.
+- **Unfinished work:** TODO(author): UNFINISHED_WORK.
 - Do not include private chat histories.
 
 ## 19. React Integration Notes

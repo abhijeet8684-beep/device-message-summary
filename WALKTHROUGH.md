@@ -43,11 +43,7 @@ Run `python -m pytest -q` from the repository root and show
 ## 5. Design choice and defect — 1 minute
 
 Explain the separation of validation and duplicate detection: invalid records do not reserve a duplicate key.
-TODO(author): Confirm that the uncaught `RecursionError` for deeply nested JSON is the defect you want to present;
-briefly explain its symptom, root cause, the per-line `BAD_JSON` fix, and the regression test that proves later input
-continues to process.
 
-**Author completion:** TODO(author): Record your actual time spent, identify AI/reuse tools and their contributions,
-explain what you changed and how you verified it, and state remaining unfinished work (or confirm none). Record the
-presentation video or add presentation screenshots; the evidence files linked above are command captures, not a
-recording or screenshots.
+TODO(author): choose the defect to present.
+
+For author disclosures and any video link, see the corresponding sections in [README.md](README.md).

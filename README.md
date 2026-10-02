@@ -27,8 +27,7 @@ TODO(author): VIDEO_OR_SCREENSHOT_URL
 15. [Known Limitation](#15-known-limitation)
 16. [Out of Scope](#16-out-of-scope)
 17. [Design Choice & Defect Fixed](#17-design-choice--defect-fixed)
-18. [AI / Reuse Disclosure](#18-ai--reuse-disclosure)
-19. [React Integration Notes](#19-react-integration-notes)
+18. [React Integration Notes](#18-react-integration-notes)
 
 ## 1. Overview
 
@@ -311,17 +310,7 @@ A React page is out of scope for this assignment. The README includes integratio
 
 **Discovery attribution:** TODO(author): DEFECT_FOUND_BY.
 
-## 18. AI / Reuse Disclosure
-
-- **AI tools:** TODO(author): AI_TOOLS_USED.
-- **AI output:** TODO(author): AI_PRODUCED.
-- **Author changes:** TODO(author): MY_CHANGES.
-- **Verification:** TODO(author): VERIFICATION.
-- **Time spent:** TODO(author): TIME_SPENT.
-- **Unfinished work:** TODO(author): UNFINISHED_WORK.
-- Do not include private chat histories.
-
-## 19. React Integration Notes
+## 18. React Integration Notes
 
 - In `useEffect`, fetch `/summary` with an `AbortController` and track state shaped like
   `{status: "loading" | "success" | "error", data, error}`.

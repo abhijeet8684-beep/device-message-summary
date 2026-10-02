@@ -1,0 +1,8 @@
+HTTP/1.1 500 INTERNAL SERVER ERROR
+Server: Werkzeug/3.1.9 Python/3.12.10
+Date: Fri, 02 Oct 2026 14:01:24 GMT
+Content-Type: application/json
+Content-Length: 98
+Connection: close
+
+{"error":{"code":"SAMPLE_FILE_UNREADABLE","message":"Unable to read sample file: missing.jsonl"}}

@@ -104,6 +104,8 @@ Start the Flask development server from the repository root:
 python app.py
 ```
 
+On macOS/Linux, run `python app.py` from the activated environment.
+
 By default, the app reads `data/sample.jsonl` relative to `app.py`. To use another input file, set `SAMPLE_FILE`
 before starting the app. An explicitly set value is used as provided.
 
@@ -157,6 +159,9 @@ On successful processing, the endpoint responds with HTTP 200 and a JSON summary
 `duplicates`, `errors`, and `devices`. The specific sample result is shown in Section 10. An empty input file is
 also successful and returns HTTP 200 with zero counts and empty lists.
 
+If the configured sample cannot be read, the endpoint responds with HTTP 500 and
+`{"error":{"code":"SAMPLE_FILE_UNREADABLE","message":"Unable to read sample file: <path>"}}`.
+
 Windows PowerShell 5 aliases `curl`; use `curl.exe`. On macOS/Linux, use
 `curl -sS -i http://127.0.0.1:5000/summary`.
 
@@ -200,17 +205,17 @@ Expected summary:
 }
 ```
 
-The captured HTTP response body is available in [`docs/evidence/summary_success.txt`](docs/evidence/summary_success.txt).
+The captured HTTP response body is available in
+[`docs/evidence/summary_success.json`](docs/evidence/summary_success.json).
 
 ## 11. Verification Evidence
 
-The repository includes captured text output for pytest and API requests:
+The following files contain command output captured from actual test and HTTP runs:
 
-- [`pytest_verbose.txt`](docs/evidence/pytest_verbose.txt)
-- [`pytest_plain.txt`](docs/evidence/pytest_plain.txt)
-- [`summary_success.txt`](docs/evidence/summary_success.txt)
-- [`summary_missing_file.txt`](docs/evidence/summary_missing_file.txt)
-- [`summary_other_cwd.txt`](docs/evidence/summary_other_cwd.txt)
+- [`tests_after.txt`](docs/evidence/tests_after.txt) — post-change pytest run.
+- [`summary_success.json`](docs/evidence/summary_success.json) — success from the default sample, with the app
+  launched outside the repository directory.
+- [`summary_failure.txt`](docs/evidence/summary_failure.txt) — `curl -i` response for an unreadable sample path.
 
 The screenshots below are embedded directly so GitHub renders them in this README:
 
@@ -234,26 +239,36 @@ Run the full test suite from the repository root:
 python -m pytest -q
 ```
 
-Verified result: **23 passed**. Captured results from both `python -m pytest -q` and `pytest -q` are in
-`docs/evidence/pytest_plain.txt`; the verbose report lists each test in `docs/evidence/pytest_verbose.txt`.
+The same command works on macOS/Linux after activating the virtual environment.
+
+Verified result after the hardening tests: **33 passed**. The fresh command output is in
+[`docs/evidence/tests_after.txt`](docs/evidence/tests_after.txt).
 
 Coverage includes the full sample summary, empty input, out-of-order sequences, field/type validation, malformed
 and deeply nested JSON, blank lines, duplicate handling, exact ID preservation, sorting, and HTTP success/failure.
 
 ## 13. Failure Handling
 
-If the configured file is missing or unreadable, the endpoint responds with HTTP 500 and JSON containing
-`error.code` equal to `SAMPLE_FILE_UNREADABLE`, plus a message identifying the path. The failure response is not
-an empty success and does not contain `accepted`. See the captured response in
-[`docs/evidence/summary_missing_file.txt`](docs/evidence/summary_missing_file.txt).
+To reproduce the unreadable-file case described in the API reference:
+
+```bash
+SAMPLE_FILE=missing.jsonl python app.py
+```
+
+```powershell
+$env:SAMPLE_FILE="missing.jsonl"; python app.py
+```
+
+The captured HTTP 500 response is in [`docs/evidence/summary_failure.txt`](docs/evidence/summary_failure.txt).
 
 ## 14. Assumptions
 
 - `NaN`, `Infinity`, and `-Infinity` are treated as invalid JSON and reported as `BAD_JSON`.
-- A single trailing newline at the end of a file is ignored. Other blank or whitespace-only lines, including extra
-  trailing blank lines, are `BAD_JSON`.
+- A single trailing newline does not create an extra record; an additional blank line is `BAD_JSON`.
 - If JSON parsing fails on a line because it is nested too deeply, that line is `BAD_JSON` and later lines continue
   to be processed.
+- A UTF-8 BOM at the start of line 1 is reported as `BAD_JSON`.
+- Duplicate keys inside one JSON object follow Python's JSON parser behavior: the last value wins.
 
 ## 15. Known Limitation
 
@@ -275,16 +290,19 @@ directory; it is now resolved relative to `app.py`. Regression tests cover both 
 
 ## 18. AI / Reuse Disclosure
 
-Claude (Anthropic) was used for planning, a reference implementation, and code review; it produced a plan, a
-reference version of the program and tests, and an independent review. GitHub Copilot was used for edits and commits
-in this repository. No existing non-AI code was reused, and no private or employer code was used. I reviewed the
-generated code against the assignment, ran the automated tests and Flask server, requested fixes after review, and
-applied the identified fixes. No private chat histories are included.
+- **AI / reuse:** TODO(author): Name the tools used, what each produced, what you changed, and how you verified it.
+- **Time spent:** TODO(author): Enter your actual time spent on the assignment.
+- **Unfinished work:** TODO(author): State any unfinished work, or confirm nothing required remains.
+- Do not include private chat histories.
 
 ## 19. React Integration Notes
 
-- Show a loading state while `GET /summary` is in progress.
-- Treat success as empty when `accepted == 0 && duplicates == 0 && errors.length == 0 && devices.length == 0`.
-- For non-empty success, render device summaries and show any errors or duplicates as warnings.
-- For HTTP failure, check `!response.ok` and parse the `{error: {code, message}}` body.
-- Handle network failures and JSON parsing failures as errors; `fetch` rejects on network errors, and response JSON parsing can fail.
+- In `useEffect`, fetch `/summary` with an `AbortController` and track state shaped like
+  `{status: "loading" | "success" | "error", data, error}`.
+- `fetch` does not reject on HTTP 500: check `response.ok`, read `error.message` from the JSON body, and use
+  `catch` for network failures.
+- Treat a result as empty when `devices.length === 0 && errors.length === 0`; `accepted === 0` alone is not empty
+  because a file containing only bad lines has errors.
+- Render loading, error, empty, and non-empty data as four distinct branches.
+- If React runs on another port, cross-origin requests need `flask-cors` or a development-server proxy; this
+  repository does not add `flask-cors`.

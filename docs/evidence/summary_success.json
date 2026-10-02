@@ -1,0 +1,1 @@
+{"accepted":3,"devices":[{"device_id":"D01","error":1,"last_sequence":3,"last_status":"error","ok":1},{"device_id":"D02","error":1,"last_sequence":2,"last_status":"error","ok":0}],"duplicates":1,"errors":[{"code":"BAD_JSON","line":4}]}
